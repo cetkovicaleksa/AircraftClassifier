@@ -1,5 +1,5 @@
 # %%
-from IPython.display import display, Markdown
+from IPython.display import display
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -11,7 +11,7 @@ import torchvision.transforms.functional as F
 # %matplotlib inline
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
-display(Markdown(f"Using device: `{device}`"))
+display(f"Using device: `{device}`")
 
 np.random.seed(14_02_2003)
 
@@ -128,28 +128,3 @@ train_loader = torch.utils.data.DataLoader(
 # %% [markdown]
 # - https://colab.research.google.com/github/pytorch/vision/blob/gh-pages/main/_generated_ipynb_notebooks/plot_transforms_illustrations.ipynb
 # - 
-
-# %%
-# %%time
-sample_dataset = train_dataset
-
-labels, indices = np.unique([label for _, label in sample_dataset.samples], return_index=True)
-images = [sample_dataset[i][0] for i in indices]
-
-plt.figure(figsize=(16, 9), frameon=False)
-
-for i, [image, label] in enumerate(zip(images, (sample_dataset.classes[l] for l in labels))):
-    ax = plt.subplot(len(images) // (columns := len(sample_dataset.classes) // 2) + 1, columns, i + 1)
-    ax.axis(i == 0)
-    plt.imshow(torch.clamp(image, 0, 1).numpy().transpose((1, 2, 0)))
-
-    ax.text(
-        0.05, 0.08, 
-        label,
-        fontsize=10, color="green", backgroundcolor="black",
-        ha="left", va="top",
-        transform=ax.transAxes,
-    )
-
-plt.tight_layout()
-plt.show()
