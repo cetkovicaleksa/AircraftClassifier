@@ -3,6 +3,8 @@ from IPython.display import display
 import numpy as np
 import matplotlib.pyplot as plt
 
+import math
+
 import torch
 import torchvision
 import torchvision.transforms as T
@@ -20,7 +22,10 @@ if torch.cuda.is_available():
     torch.cuda.random.manual_seed_all(14_02_2003)
 
 # %% [markdown]
-# # Aircraft Classifier
+"""
+# Aircraft Classifier
+"""
+
 # %%
 variants = {
     "F/A-18",
@@ -46,6 +51,9 @@ if any(os.path.exists(path) for path in ["data/train", "data/test", "data/val", 
     pass
 
 # %%
+to_pil = T.ToPILImage(mode='RGB')
+to_tensor = T.ToTensor()
+
 class RemoveCopyright:
     def __call__(self, img):
         match type(img):
@@ -61,9 +69,9 @@ class RemoveCopyright:
     
     
 normalize = T.Compose([
-    T.ToTensor(),
     RemoveCopyright(),
     T.Resize((244, 244)),
+    to_tensor
 ])
 
 augment = T.Compose([
@@ -93,27 +101,12 @@ display(train_dataset, val_dataset, test_dataset)
 sample_dataset = train_dataset
 
 labels, indices = np.unique([label for _, label in sample_dataset.samples], return_index=True)
-images = [sample_dataset[i][0] for i in indices]
+images = torch.stack([sample_dataset[i][0] for i in indices])
 
-_, axes = plt.subplots(nrows := 2, len(images) // nrows, figsize=(16, 9), frameon=False, tight_layout=True)
+grid = torchvision.utils.make_grid(images, nrow=math.ceil(math.sqrt(len(images) * 2)))
+grid = grid.permute(1, 2, 0).numpy()
 
-for i, [ax, image, label] in enumerate(zip(axes.ravel(), images, labels)):
-    image = torch.clamp(image, 0, 1).numpy().transpose([1, 2, 0])
-    ax.imshow(image)
-    ax.axis(i == 0)
-
-    ax.text(
-        0.03, 0.05, 
-        sample_dataset.classes[label],
-        fontsize=12, color="green", backgroundcolor="black",
-        ha="left", va="top",
-        transform=ax.transAxes,
-    )   
-
-for ax in axes[len(images):]:
-    ax.remove()
-
-plt.show()
+display(to_pil(grid))
 
 # %%
 BATCH_SIZE = 2**5
