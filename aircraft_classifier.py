@@ -15,6 +15,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import math
+import os
+from pathlib import Path
 
 import torch
 import torchvision
@@ -51,15 +53,22 @@ variants = {
     "747-200"
 }
 
-variants_arg = " ".join(map('"{}"'.format, variants))
+data_dir = Path('./data')
 
-import os
+args = [
+    '-o', os.fspath(data_dir), 
+    '--a', 'variant', 
+    '--splits', "train val test", 
+    '--classes', ' '.join(f'"{variant}"' for variant in variants) 
+]
 
-FGVCAIRCRAFT_ROOT = os.getenv('FGVCAIRCRAFT_ROOT', "./data")
+FGVCAIRCRAFT_ROOT = os.getenv('FGVCAIRCRAFT_ROOT')
+if FGVCAIRCRAFT_ROOT is not None:
+    args.extend(['-r', os.fspath(Path(FGVCAIRCRAFT_ROOT.strip() or data_dir))])
 
-if any(os.path.exists(path) for path in ["data/train", "data/test", "data/val", "data/trainval"]): 
-    # %run download_fgvcaircraft.py -r $FGVCAIRCRAFT_ROOT -o "./data" --splits train test val --classes $variants_arg
-    pass
+args_str = ' '.join(args)
+
+# %run download_fgvcaircraft.py $args_str
 
 # %%
 to_pil = T.ToPILImage(mode='RGB')
@@ -92,17 +101,17 @@ augment = T.Compose([
 
 # %%
 train_dataset = torchvision.datasets.ImageFolder(
-    root="./data/train",
+    root=data_dir/"train",
     transform=T.Compose([*normalize.transforms, *augment.transforms]) # unpack just to display it nicely (without nested compose)
 )
 
 val_dataset = torchvision.datasets.ImageFolder(
-    root="./data/val",
+    root=data_dir/"val",
     transform=normalize
 )
 
 test_dataset = torchvision.datasets.ImageFolder(
-    root="./data/test",
+    root=data_dir/"test",
     transform=normalize
 )
 
