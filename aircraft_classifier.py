@@ -359,7 +359,7 @@ dataset = {
 
 model = AircraftCNNClassifier(num_classes).to(device)
 
-# %%time
+# %%
 results = train_model(
     model, 
     train_loader=DataLoader(dataset['train'], BATCH_SIZE, shuffle=True), 
@@ -405,7 +405,7 @@ for param in resnet_model.fc.parameters():
 
 resnet_model = resnet_model.to(device);
 
-# %%time
+# %%
 resnet_results = train_model(
     resnet_model, 
     train_loader=DataLoader(resnet_dataset['train'], BATCH_SIZE, shuffle=True),
@@ -452,7 +452,7 @@ for param in enet_model.get_classifier().parameters(): # type: ignore # pyright:
 
 enet_model = enet_model.to(device);
 
-# %%time
+# %%
 enet_results = train_model(
     enet_model,
     train_loader=DataLoader(enet_dataset['train'], BATCH_SIZE, shuffle=True),
