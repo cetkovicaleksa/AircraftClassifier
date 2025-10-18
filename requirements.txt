@@ -1,11 +1,15 @@
-scikit-learn
-
 matplotlib
 seaborn
+numpy
 
 ipython
 ipykernel
 notebook
+pathvalidate
+tqdm
 
-torch
-torchvision
+
+torch==2.8.0
+torchvision==0.23.0
+torchmetrics
+timm>=1.0.0
