@@ -64,12 +64,12 @@ def train_model(
             
             optimizer_.zero_grad()
             preds = model(images)
-            preds = torch.argmax(preds, dim=1)
             loss = criterion_(preds, labels)
             loss.backward()
             optimizer_.step()
 
             train_cost += loss.item()
+            preds = torch.argmax(preds, dim=1)
             train_acc.update(preds, labels)
         
         train_loss = train_cost / (num_batches := len(train_loader))
@@ -86,6 +86,7 @@ def train_model(
                 images, labels = images.to(device), labels.to(device)
                 
                 preds = model(images)
+                preds = torch.argmax(preds, dim=1)
                 val_acc.update(preds, labels)
                 val_acc_per_class.update(preds, labels)
                 val_f1.update(preds, labels)
@@ -126,7 +127,7 @@ def visualize_training_results(results: TrainingResult, rich_fmt: bool = True, l
     summary = f"""
 ### Training Results   
 
-Training finished at epoch {results.epoch}.
+Best model at epoch {results.epoch}.
 
 - **Train loss:** {results.train_loss:.3f}  
 - **Train accuracy:** {results.train_acc:.3f}  
@@ -148,6 +149,6 @@ Training finished at epoch {results.epoch}.
         ax2.set_xticklabels(labels, rotation=90, ha='center')
         ax2.set_yticklabels(labels, rotation=0, va='center')
 
-    plt.tight_layout()
+    #plt.tight_layout()
     plt.show()
     
